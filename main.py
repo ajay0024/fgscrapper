@@ -1,16 +1,19 @@
-# This is a sample Python script.
+import requests, re
+from bs4 import BeautifulSoup
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+WEB_ADDRESS = "https://fitgirl-repacks.site/"
+COUNT_LINK = "https://fitgirl-repacks-site.disqus.com/count-data.js?1="
+
+r = requests.get(WEB_ADDRESS)
+print(r.status_code)
+soup = BeautifulSoup(r.text, features="html.parser")
+articles = soup.find_all('article')
+for article in articles:
+    game_name = article.h1.text
+    comment_elem = article.find('span', attrs={"class": "dsq-postid"})
+    link = comment_elem['data-dsqidentifier']
+    count_file = requests.get(COUNT_LINK+link).text
+    comments_count = re.findall(r'"comments":(\d*)',count_file)[1]
+    print(game_name,comments_count)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
